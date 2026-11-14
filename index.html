@@ -8,7 +8,7 @@
         :root {
             --color-normal: #10b981; /* 緑（0°基準・ロック定着） */
             --color-side: #ef4444;   /* 赤（移動・基準面からのズレ） */
-            --active-band-color: var(--color-normal);
+            --active-band-color: #10b981;
             --bg-black: #000000;
             --overlay-color: rgba(0, 0, 0, 0);
         }
@@ -25,6 +25,7 @@
             padding: 0;
             width: 100%;
             height: 100%;
+            height: 100vh;
             height: 100dvh;
             overflow: hidden;
             background-color: var(--bg-black);
@@ -32,13 +33,17 @@
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
             touch-action: none;
             -webkit-text-size-adjust: 100%;
+            position: relative;
         }
 
-        /* 横持ち対応ステージ（縦ロック時はJSで90°回転して横向き化） */
+        /* 横持ち対応ステージ（初期サイズを確保して0x0化を防止） */
         #landscape-stage {
             position: fixed;
             top: 50%;
             left: 50%;
+            width: 100vw;
+            height: 100vh;
+            transform: translate(-50%, -50%);
             transform-origin: center center;
             overflow: hidden;
             background-color: transparent;
@@ -47,7 +52,7 @@
         /* ARカメラ背景（ファイル1継承） */
         #camera-bg {
             position: fixed;
-            inset: 0;
+            top: 0; left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -57,9 +62,9 @@
 
         #color-overlay {
             position: absolute;
-            inset: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background-color: var(--overlay-color);
-            transition: background-color 0.22s ease;
+            transition: background-color 0.2s ease;
             z-index: 0;
             pointer-events: none;
         }
@@ -67,10 +72,10 @@
         /* 方眼グリッド（添付画像＆ファイル1継承） */
         .grid {
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
+            top: -40%;
+            left: -40%;
+            width: 180%;
+            height: 180%;
             background-image:
                 linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
@@ -79,10 +84,10 @@
             pointer-events: none;
         }
 
-        /* 角度に応じて画面上に現れる薄い虹色の音階区分（スクロールトラック） */
+        /* 角度によって画面上に出現する薄い虹色の音階区分（スクロールトラック） */
         #scale-viewport {
             position: absolute;
-            inset: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             z-index: 2;
             pointer-events: none;
             overflow: hidden;
@@ -92,7 +97,7 @@
             position: absolute;
             left: 0;
             width: 100%;
-            top: 50%; /* 中央水平線が基準 */
+            top: 50%;
             will-change: transform;
         }
 
@@ -102,110 +107,135 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 26px;
+            padding: 0 44px 0 22px;
             border-top: 1px solid rgba(255, 255, 255, 0.09);
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            transition: background 0.14s ease, box-shadow 0.14s ease;
+            transition: background 0.12s ease;
         }
 
         .scale-layer .layer-note {
-            font-size: 0.95rem;
+            font-size: 0.96rem;
             font-weight: 700;
             letter-spacing: 0.05em;
-            color: rgba(255, 255, 255, 0.45);
-            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
-            transition: color 0.14s ease, transform 0.14s ease;
+            color: rgba(255, 255, 255, 0.5);
+            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.85);
+            transition: color 0.12s ease, transform 0.12s ease;
         }
 
         .scale-layer .layer-deg {
             font-size: 0.72rem;
             font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-            color: rgba(255, 255, 255, 0.34);
+            color: rgba(255, 255, 255, 0.35);
         }
 
         .scale-layer.active .layer-note {
             color: #ffffff;
-            transform: scale(1.12);
-            text-shadow: 0 0 14px rgba(255, 255, 255, 0.75);
+            transform: scale(1.1);
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
         }
 
         .scale-layer.active .layer-deg {
-            color: rgba(255, 255, 255, 0.85);
+            color: rgba(255, 255, 255, 0.88);
         }
 
         /* 0度よりマイナスの無音基準面ゾーン */
         .neutral-base-zone {
             width: 100%;
-            height: 420px;
-            background: linear-gradient(to bottom, rgba(16, 185, 129, 0.12) 0%, rgba(0, 0, 0, 0.88) 28%, rgba(0, 0, 0, 0.96) 100%);
-            border-top: 2px solid rgba(255, 255, 255, 0.55);
+            height: 360px;
+            background: linear-gradient(to bottom, rgba(16, 185, 129, 0.14) 0%, rgba(0, 0, 0, 0.88) 26%, rgba(0, 0, 0, 0.96) 100%);
+            border-top: 2px solid rgba(255, 255, 255, 0.6);
             display: flex;
             align-items: flex-start;
             justify-content: space-between;
-            padding: 10px 26px;
+            padding: 10px 44px 10px 22px;
         }
 
         .neutral-base-zone span {
             font-size: 0.72rem;
             font-weight: 600;
-            letter-spacing: 0.08em;
-            color: rgba(255, 255, 255, 0.48);
+            letter-spacing: 0.06em;
+            color: rgba(255, 255, 255, 0.52);
         }
 
-        /* タップで設定される0°基準面の膜（ファイル1継承：色差の可視化） */
+        /* タップで設定される0°基準面の膜（軽量化のためbackdrop-filterなし） */
         #offset-bg {
             position: absolute;
             top: 50%;
-            left: -100%;
-            width: 300%;
-            height: 300%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
             background: linear-gradient(to bottom,
                 var(--active-band-color) 0%,
-                rgba(0, 0, 0, 0.35) 26%,
-                transparent 62%);
+                rgba(0, 0, 0, 0.25) 20%,
+                transparent 50%);
             border-top: 2px solid var(--active-band-color);
             transform-origin: top center;
             z-index: 3;
             pointer-events: none;
-            opacity: 0.48;
-            transition: border-color 0.18s ease, opacity 0.18s ease;
+            opacity: 0.42;
+            transition: border-color 0.16s ease, opacity 0.16s ease;
         }
 
-        /* 動的な水平水面（ファイル1継承） */
+        /* 動的な水平水面（ファイル1継承・軽量版） */
         #sea-level {
             position: absolute;
             top: 50%;
-            left: -100%;
-            width: 300%;
-            height: 300%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
             background: linear-gradient(to bottom,
-                rgba(255, 255, 255, 0.24) 0%,
-                rgba(255, 255, 255, 0.05) 14%,
-                rgba(255, 255, 255, 0.0) 55%);
-            border-top: 2px solid rgba(255, 255, 255, 0.82);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+                rgba(255, 255, 255, 0.22) 0%,
+                rgba(255, 255, 255, 0.05) 12%,
+                rgba(255, 255, 255, 0.0) 45%);
+            border-top: 2px solid rgba(255, 255, 255, 0.85);
             transform-origin: top center;
             z-index: 4;
-            overflow: hidden;
             pointer-events: none;
         }
 
-        #sea-level::after {
-            content: '';
+        /* 右端：全音階の位置がひと目でわかるミニ虹色ラダー */
+        #pitch-ladder {
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 200%;
-            height: 100%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.32) 0%, transparent 10%, transparent 100%);
-            animation: waveReflect 3s infinite ease-in-out alternate;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 14px;
+            height: 54%;
+            display: flex;
+            flex-direction: column-reverse;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            z-index: 16;
             pointer-events: none;
         }
 
-        @keyframes waveReflect {
-            0% { transform: translateY(0) rotate(0.7deg); opacity: 0.4; }
-            100% { transform: translateY(3px) rotate(-0.7deg); opacity: 0.8; }
+        .ladder-pip {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            opacity: 0.45;
+            transition: transform 0.1s ease, opacity 0.1s ease;
+        }
+
+        .ladder-pip.active {
+            opacity: 1;
+            transform: scale(1.45);
+            box-shadow: 0 0 8px #ffffff;
+        }
+
+        #ladder-cursor {
+            position: absolute;
+            left: -4px;
+            width: 22px;
+            height: 3px;
+            background: #ffffff;
+            border-radius: 2px;
+            box-shadow: 0 0 8px #ffffff;
+            bottom: 4px;
         }
 
         /* 左右水平ガイド線（添付画像1・4の "—"） */
@@ -213,8 +243,8 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 68%;
-            max-width: 480px;
+            width: 64%;
+            max-width: 440px;
             transform: translate(-50%, -50%);
             display: flex;
             justify-content: space-between;
@@ -224,7 +254,7 @@
         }
 
         .tick-line {
-            width: 36px;
+            width: 34px;
             height: 2px;
             background: rgba(255, 255, 255, 0.9);
             border-radius: 2px;
@@ -234,7 +264,7 @@
         /* 中央バブル＆リキッドグラスレンズ */
         #face-ui {
             position: absolute;
-            inset: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -244,45 +274,43 @@
 
         .bubble {
             position: absolute;
-            width: 128px;
-            height: 128px;
+            width: 122px;
+            height: 122px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.1);
             box-shadow:
                 inset -8px -8px 18px rgba(0, 0, 0, 0.35),
                 inset 8px 8px 18px rgba(255, 255, 255, 0.38),
                 0 6px 20px rgba(0, 0, 0, 0.25);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
             background-image: radial-gradient(circle at 30% 28%, rgba(255, 255, 255, 0.55) 0%, transparent 42%);
             transition: background-color 0.16s ease;
         }
 
         #liquid-lens {
             position: relative;
-            width: 146px;
-            height: 162px;
+            width: 142px;
+            height: 156px;
             border-radius: 48% 52% 50% 50% / 44% 44% 56% 56%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.16), rgba(0, 0, 0, 0.26) 65%, rgba(255, 255, 255, 0.08));
-            backdrop-filter: blur(9px) saturate(150%);
-            -webkit-backdrop-filter: blur(9px) saturate(150%);
+            background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.18), rgba(0, 0, 0, 0.32) 65%, rgba(255, 255, 255, 0.08));
+            backdrop-filter: blur(8px) saturate(140%);
+            -webkit-backdrop-filter: blur(8px) saturate(140%);
             box-shadow:
                 inset 3px 0 8px rgba(0, 225, 255, 0.45),
                 inset -3px 0 8px rgba(255, 70, 140, 0.45),
                 inset 0 3px 10px rgba(255, 255, 255, 0.45),
                 inset 0 -8px 16px rgba(0, 0, 0, 0.55),
-                0 10px 30px rgba(0, 0, 0, 0.55);
-            border: 1px solid rgba(255, 255, 255, 0.28);
+                0 10px 28px rgba(0, 0, 0, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             z-index: 15;
         }
 
         #angle-text {
             color: #ffffff;
-            font-size: 3.1rem;
+            font-size: 3rem;
             font-weight: 300;
             line-height: 1;
             letter-spacing: -0.02em;
@@ -294,20 +322,20 @@
 
         #note-readout {
             margin-top: 5px;
-            font-size: 0.98rem;
+            font-size: 0.96rem;
             font-weight: 700;
             letter-spacing: 0.06em;
-            color: rgba(255, 255, 255, 0.95);
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+            color: rgba(255, 255, 255, 0.96);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.75);
         }
 
         #state-pill {
             margin-top: 5px;
             padding: 2px 9px;
             border-radius: 999px;
-            font-size: 0.62rem;
+            font-size: 0.6rem;
             font-weight: 700;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.08em;
             background: rgba(255, 255, 255, 0.14);
             border: 1px solid rgba(255, 255, 255, 0.24);
             color: #f8fafc;
@@ -322,7 +350,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 14px;
+            padding: 0 12px;
             z-index: 50;
             pointer-events: none;
             gap: 6px;
@@ -338,18 +366,17 @@
 
         .glass-btn {
             pointer-events: auto;
-            background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
+            background: rgba(25, 25, 30, 0.65);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.24);
             color: #ffffff;
-            padding: 6px 11px;
+            padding: 6px 10px;
             border-radius: 999px;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 600;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-            transition: transform 0.1s, background 0.2s;
             display: inline-flex;
             align-items: center;
             gap: 3px;
@@ -357,7 +384,7 @@
         }
 
         .glass-btn:active { transform: scale(0.94); background: rgba(255, 255, 255, 0.28); }
-        .glass-btn.active { background: rgba(16, 185, 129, 0.38); border-color: rgba(16, 185, 129, 0.85); }
+        .glass-btn.active { background: rgba(16, 185, 129, 0.42); border-color: rgba(16, 185, 129, 0.9); }
 
         select.glass-btn {
             appearance: none;
@@ -374,7 +401,7 @@
             transform: translateX(-50%);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             z-index: 60;
             max-width: 96%;
         }
@@ -382,56 +409,52 @@
         #bottom-dock {
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 2px;
             padding: 4px;
             border-radius: 999px;
-            background: rgba(20, 20, 24, 0.68);
-            backdrop-filter: blur(20px) saturate(165%);
-            -webkit-backdrop-filter: blur(20px) saturate(165%);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 8px 24px rgba(0, 0, 0, 0.6);
+            background: rgba(20, 20, 24, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.22), 0 8px 24px rgba(0, 0, 0, 0.6);
             overflow-x: auto;
         }
 
         .preset-pill {
             background: transparent;
             border: none;
-            color: rgba(255, 255, 255, 0.68);
-            padding: 6px 11px;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 6px 10px;
             border-radius: 999px;
-            font-size: 0.74rem;
+            font-size: 0.72rem;
             font-weight: 600;
             cursor: pointer;
             white-space: nowrap;
-            transition: background 0.18s, color 0.18s, transform 0.1s;
         }
 
         .preset-pill:active { transform: scale(0.95); }
         .preset-pill.active {
-            background: rgba(255, 255, 255, 0.24);
+            background: rgba(255, 255, 255, 0.25);
             color: #ffffff;
             box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45);
         }
 
-        /* 左右傾け＝響き具合インジケータ（コンパクト横向き版） */
         #space-meter {
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 0.64rem;
-            color: rgba(255, 255, 255, 0.75);
-            background: rgba(0, 0, 0, 0.48);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 6px 10px;
+            gap: 5px;
+            font-size: 0.62rem;
+            color: rgba(255, 255, 255, 0.78);
+            background: rgba(20, 20, 24, 0.72);
+            padding: 6px 9px;
             border-radius: 999px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.16);
             pointer-events: none;
             white-space: nowrap;
         }
 
         .space-bar-wrap {
-            width: 54px;
+            width: 46px;
             height: 4px;
             background: rgba(255, 255, 255, 0.18);
             border-radius: 4px;
@@ -450,41 +473,39 @@
             box-shadow: 0 0 6px #ffffff;
         }
 
-        /* スタートオーバーレイ */
+        /* スタートオーバーレイ（軽量背景でクラッシュ防止） */
         #start-overlay {
             position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(5, 8, 14, 0.94);
             z-index: 200;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 16px;
+            padding: 14px;
             pointer-events: auto;
         }
 
         .start-card {
             max-width: 540px;
             width: 100%;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            border-radius: 24px;
-            padding: 18px 22px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 22px;
+            padding: 16px 20px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75);
+            gap: 9px;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.75);
         }
 
         .guide-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px 14px;
-            font-size: 0.76rem;
+            gap: 8px 12px;
+            font-size: 0.75rem;
             line-height: 1.45;
-            color: rgba(255, 255, 255, 0.85);
+            color: rgba(255, 255, 255, 0.86);
             text-align: left;
         }
 
@@ -495,29 +516,42 @@
             background: #ffffff;
             border: none;
             border-radius: 999px;
-            font-size: 1rem;
+            font-size: 0.98rem;
             font-weight: 800;
             color: #000000;
             cursor: pointer;
-            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25);
+            box-shadow: 0 6px 18px rgba(255, 255, 255, 0.25);
         }
         #start-btn:active { transform: scale(0.97); }
 
         #toast {
             position: absolute;
-            top: 52px;
+            top: 50px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(15, 23, 42, 0.9);
+            background: rgba(15, 23, 42, 0.92);
             color: #ffffff;
             padding: 6px 16px;
             border-radius: 999px;
-            font-size: 0.74rem;
+            font-size: 0.73rem;
             display: none;
             z-index: 300;
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             white-space: nowrap;
+        }
+
+        #error-banner {
+            position: fixed;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+            background: rgba(185, 28, 28, 0.95);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            z-index: 999;
+            display: none;
         }
     </style>
 </head>
@@ -537,7 +571,10 @@
         <div id="offset-bg"></div>
         <div id="sea-level"></div>
 
-        <!-- 左右ガイド線 -->
+        <!-- 右端の虹色音階ガイド -->
+        <div id="pitch-ladder"></div>
+
+        <!-- 左右水平ガイド線 -->
         <div class="horizon-ticks">
             <div class="tick-line" id="tick-left"></div>
             <div class="tick-line" id="tick-right"></div>
@@ -547,12 +584,12 @@
         <div id="top-controls" onpointerdown="event.stopPropagation()">
             <div class="pill-group">
                 <button class="glass-btn" onclick="calibrate(event)">🎯 0° 基準</button>
-                <button class="glass-btn" id="invert-btn" onclick="toggleInvert(event)">⇄ ひねり反転</button>
+                <button class="glass-btn" id="invert-btn" onclick="toggleInvert(event)">⇄ 反転</button>
                 <button class="glass-btn" id="flip-btn" onclick="toggleFlip180(event)">⟳ 180°</button>
                 <select class="glass-btn" id="scale-select" onchange="onScaleChange(event)">
                     <option value="simple6" selected>🎹 かんたん6音(ド〜ラ)</option>
                     <option value="major8">🌈 メジャー8音(ド〜ド)</option>
-                    <option value="pentatonic6">✨ ペンタ6音(外れなし)</option>
+                    <option value="pentatonic6">✨ ペンタ6音</option>
                 </select>
             </div>
             <div class="pill-group">
@@ -572,7 +609,7 @@
             </div>
         </div>
 
-        <!-- 下部ガラスピル（音色切替＋響きメータ） -->
+        <!-- 下部ガラスピル（5音色＋響きメータ） -->
         <div id="bottom-bar" onpointerdown="event.stopPropagation()">
             <div id="bottom-dock">
                 <button class="preset-pill active" data-preset="piano" onclick="selectPreset('piano', event)">🎹 ピアノ</button>
@@ -592,15 +629,15 @@
         <div id="start-overlay" onpointerdown="event.stopPropagation()">
             <div class="start-card">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:0.7rem; letter-spacing:0.16em; color:#10b981; font-weight:700;">HORIZONTAL LEVEL SYNTH</span>
-                    <span style="font-size:0.7rem; color:rgba(255,255,255,0.5);">横持ち専用</span>
+                    <span style="font-size:0.7rem; letter-spacing:0.15em; color:#10b981; font-weight:700;">HORIZONTAL LEVEL SYNTH</span>
+                    <span style="font-size:0.7rem; color:rgba(255,255,255,0.55);">横持ち専用</span>
                 </div>
-                <h1 style="margin:0; font-size:1.45rem; font-weight:800;">横持ち水準器スロットル楽器</h1>
+                <h1 style="margin:0; font-size:1.38rem; font-weight:800;">横持ち水準器スロットル楽器</h1>
                 <div class="guide-grid">
-                    <div>🎯 <strong>基準面（0°以下は無音）：</strong> 画面タップでいつでも今の角度を <strong>0°基準面</strong> にできます。0°以下は無音の待機面です。</div>
-                    <div>🎹 <strong>狙ってピタッと止める：</strong> ひねり中は無音で、<strong>動きを止めた角度の音だけ</strong>が固定して鳴ります。</div>
-                    <div>🏍️ <strong>0°に戻して吹きなおす：</strong> 一度ロックした音は、0°（またはマイナス）へ戻すまで固定されたままになります。</div>
-                    <div>🌊 <strong>左右に傾けて響き調整：</strong> 左で深いリバーブ、右でエコー＆明るさが加わります（PCはドラッグ操作対応）。</div>
+                    <div>🎯 <strong>基準面（0°以下は無音）：</strong> 画面タップで今の角度が <strong>0°基準面</strong> になります。0°以下は音なしの待機面です。</div>
+                    <div>🎹 <strong>止めた所だけ鳴って固定：</strong> ひねり中は無音で、<strong>動きを止めた位置の音だけ</strong>が鳴り固定されます。</div>
+                    <div>🏍️ <strong>0°に戻して吹きなおす：</strong> 一度鳴った音は、0°（またはマイナス）へ戻すまで音程が固定されます。</div>
+                    <div>🌊 <strong>左右傾けで響き操作：</strong> 左で深いリバーブ、右でエコー（PCは上下左右ドラッグで確認可）。</div>
                 </div>
                 <button id="start-btn" onclick="startApp(event)">横持ちで演奏スタート</button>
             </div>
@@ -609,23 +646,151 @@
         <div id="toast"></div>
     </div>
 
+    <div id="error-banner"></div>
+
     <script>
+        window.onerror = function (msg) {
+            const b = document.getElementById('error-banner');
+            if (b) {
+                b.style.display = 'block';
+                b.textContent = 'エラー: ' + msg;
+            }
+        };
+
         // ==========================================
-        // 1. 横持ち画面レイアウト自動回転（縦ロック対応）
+        // 1. パラメータ＆音階定義（手首が疲れない快適角度レンジ）
         // ==========================================
-        const stage = document.getElementById('landscape-stage');
+        const MIN_PLAY_ANGLE = 4.5;  // これ以上ひねると音階エリア
+        const RESET_ANGLE = 2.5;     // ロック後、ここまで戻したらリセット（0°付近で確実に切れる）
+        const LAYER_DEG_SPAN = 6.0;  // 1音あたり6°（全6音で4.5°〜40.5°の快適範囲）
+
+        const SCALE_DEFS = {
+            simple6: {
+                notes: [60, 62, 64, 65, 67, 69],
+                labels: ["ド C4", "レ D4", "ミ E4", "ファ F4", "ソ G4", "ラ A4"],
+                hues: [0, 32, 54, 138, 192, 240]
+            },
+            major8: {
+                notes: [60, 62, 64, 65, 67, 69, 71, 72],
+                labels: ["ド C4", "レ D4", "ミ E4", "ファ F4", "ソ G4", "ラ A4", "シ B4", "ド C5"],
+                hues: [0, 28, 50, 132, 182, 218, 266, 310]
+            },
+            pentatonic6: {
+                notes: [60, 62, 64, 67, 69, 72],
+                labels: ["ド C4", "レ D4", "ミ E4", "ソ G4", "ラ A4", "ド C5"],
+                hues: [350, 34, 62, 165, 212, 282]
+            }
+        };
+
+        // 状態変数
         let flip180 = false;
         let activeRotationDeg = 0;
-        let stageWidth = window.innerWidth;
-        let stageHeight = window.innerHeight;
+        let stageWidth = window.innerWidth || 800;
+        let stageHeight = window.innerHeight || 400;
+        let layerPxHeight = 72;
+
+        let curPitch = 0, curRoll = 0, prevSafeRoll = 0;
+        let offsetTwist = 0, offsetRoll = 0;
+        let isCalibratedOnce = false;
+        let invertTwist = false;
+
+        let smoothTwist = 0, smoothRoll = 0;
+        let prevTwist = 0, twistVel = 0;
+        let currentRPM = 0;
+
+        let velocityY = 0, lastPitchForSpring = 0, springY = 0;
+
+        let playState = 'NEUTRAL'; // 'NEUTRAL' | 'AIMING' | 'LOCKED'
+        let peakAimVel = 0;
+        let settleMs = 0;
+        let lockedIndex = -1;
+        let lockedNoteName = '';
+        let lockedFreq = 0;
+
+        let colorNormal = "#10b981";
+        let colorSide = "#ef4444";
+        let isCameraOn = false;
+        let videoStream = null;
+        let isStarted = false;
+
+        // ドラッグ用変数（先に宣言してTDZ回避）
+        let isDragging = false, dragMoved = false;
+        let dragStartTime = 0, dragStartX = 0, dragStartY = 0;
+        let dragBaseTwist = 0, dragBaseRoll = 0;
+
+        // ==========================================
+        // 2. 横向きレイアウト＆虹色レイヤー生成
+        // ==========================================
+        const stage = document.getElementById('landscape-stage');
+
+        function getScaleConfig() {
+            const sel = document.getElementById('scale-select');
+            const key = sel ? sel.value : 'simple6';
+            return SCALE_DEFS[key] || SCALE_DEFS.simple6;
+        }
+
+        function buildScaleLayers() {
+            const track = document.getElementById('scale-track');
+            const ladder = document.getElementById('pitch-ladder');
+            if (!track || !ladder) return;
+
+            const cfg = getScaleConfig();
+            const count = cfg.notes.length;
+            layerPxHeight = Math.max(58, Math.min(86, Math.round(stageHeight * 0.22)));
+
+            track.innerHTML = '';
+            ladder.innerHTML = '';
+
+            for (let i = count - 1; i >= 0; i--) {
+                const div = document.createElement('div');
+                div.className = 'scale-layer';
+                div.dataset.idx = String(i);
+                div.style.height = `${layerPxHeight}px`;
+
+                const hue = cfg.hues[i % cfg.hues.length];
+                div.style.background = `linear-gradient(90deg,
+                    hsla(${hue}, 82%, 58%, 0.14) 0%,
+                    hsla(${hue}, 82%, 58%, 0.04) 50%,
+                    hsla(${hue}, 82%, 58%, 0.14) 100%)`;
+
+                const degStart = Math.round(MIN_PLAY_ANGLE + i * LAYER_DEG_SPAN);
+                const degEnd = Math.round(MIN_PLAY_ANGLE + (i + 1) * LAYER_DEG_SPAN);
+
+                div.innerHTML = `
+                    <span class="layer-note">${cfg.labels[i]}</span>
+                    <span class="layer-deg">${degStart}°–${degEnd}°</span>
+                `;
+                track.appendChild(div);
+            }
+
+            // 右端ミニ虹色ラダー用ドット（下→上）
+            for (let i = 0; i < count; i++) {
+                const pip = document.createElement('div');
+                pip.className = 'ladder-pip';
+                pip.dataset.idx = String(i);
+                const hue = cfg.hues[i % cfg.hues.length];
+                pip.style.backgroundColor = `hsl(${hue}, 88%, 62%)`;
+                ladder.appendChild(pip);
+            }
+            const cursor = document.createElement('div');
+            cursor.id = 'ladder-cursor';
+            ladder.appendChild(cursor);
+
+            const baseZone = document.createElement('div');
+            baseZone.className = 'neutral-base-zone';
+            baseZone.innerHTML = `
+                <span>0° 基準面（以下は無音／戻して吹きなおし）</span>
+                <span>0° 以下</span>
+            `;
+            track.appendChild(baseZone);
+        }
 
         function updateLayoutOrientation() {
-            const vw = window.innerWidth;
-            const vh = window.innerHeight;
-            const isPortraitViewport = vw < vh;
+            const vw = window.innerWidth || document.documentElement.clientWidth || 800;
+            const vh = window.innerHeight || document.documentElement.clientHeight || 400;
+            if (vw < 50 || vh < 50) return;
 
-            if (isPortraitViewport) {
-                // 画面縦ロック中のスマホでも、横持ちで正立表示されるよう90°回転
+            if (vw < vh) {
                 stageWidth = vh;
                 stageHeight = vw;
                 activeRotationDeg = flip180 ? 90 : -90;
@@ -651,93 +816,15 @@
         window.addEventListener('resize', updateLayoutOrientation);
         window.addEventListener('orientationchange', () => setTimeout(updateLayoutOrientation, 120));
 
-        // ==========================================
-        // 2. 音階＆角度層パラメータ
-        // ==========================================
-        const MIN_PLAY_ANGLE = 4.5;  // これ以上ひねると音階エリア
-        const RESET_ANGLE = 1.5;     // ロック後、ここまで(0°付近/マイナス)戻したらリセット
-        const LAYER_DEG_SPAN = 8.0;  // 1音あたりの角度幅（広いのでピアノ曲が弾きやすい）
-
-        const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-        const SCALE_DEFS = {
-            simple6: {
-                notes: [60, 62, 64, 65, 67, 69],
-                labels: ["ド C4", "レ D4", "ミ E4", "ファ F4", "ソ G4", "ラ A4"],
-                hues: [0, 32, 54, 138, 192, 238]
-            },
-            major8: {
-                notes: [60, 62, 64, 65, 67, 69, 71, 72],
-                labels: ["ド C4", "レ D4", "ミ E4", "ファ F4", "ソ G4", "ラ A4", "シ B4", "ド C5"],
-                hues: [0, 28, 50, 132, 182, 218, 266, 310]
-            },
-            pentatonic6: {
-                notes: [60, 62, 64, 67, 69, 72],
-                labels: ["ド C4", "レ D4", "ミ E4", "ソ G4", "ラ A4", "ド C5"],
-                hues: [350, 34, 62, 165, 212, 282]
-            }
-        };
-
-        let layerPxHeight = 76; // 横画面で1画面に約4〜5層だけ見える見やすい高さ
-
-        function getScaleConfig() {
-            const key = document.getElementById('scale-select').value;
-            return SCALE_DEFS[key];
-        }
-
-        function buildScaleLayers() {
-            const track = document.getElementById('scale-track');
-            if (!track) return;
-            const cfg = getScaleConfig();
-            const count = cfg.notes.length;
-
-            // 横画面の高さに応じて1層の高さを調整（1画面に約3〜4層が表示されるように）
-            layerPxHeight = Math.max(62, Math.min(92, Math.round(stageHeight * 0.22)));
-
-            track.innerHTML = '';
-            // 上から下へ高音→低音→0°基準面の順に積む
-            for (let i = count - 1; i >= 0; i--) {
-                const div = document.createElement('div');
-                div.className = 'scale-layer';
-                div.dataset.idx = i;
-                div.style.height = `${layerPxHeight}px`;
-
-                const hue = cfg.hues[i % cfg.hues.length];
-                div.style.background = `linear-gradient(90deg,
-                    hsla(${hue}, 82%, 58%, 0.14) 0%,
-                    hsla(${hue}, 82%, 58%, 0.04) 50%,
-                    hsla(${hue}, 82%, 58%, 0.14) 100%)`;
-
-                const degStart = Math.round(MIN_PLAY_ANGLE + i * LAYER_DEG_SPAN);
-                const degEnd = Math.round(MIN_PLAY_ANGLE + (i + 1) * LAYER_DEG_SPAN);
-
-                div.innerHTML = `
-                    <span class="layer-note">${cfg.labels[i]}</span>
-                    <span class="layer-deg">${degStart}°–${degEnd}°</span>
-                `;
-                track.appendChild(div);
-            }
-
-            // 最下部に 0°以下の無音基準面ゾーンを追加
-            const baseZone = document.createElement('div');
-            baseZone.className = 'neutral-base-zone';
-            baseZone.innerHTML = `
-                <span>0° 基準面（以下は無音／戻してリセット）</span>
-                <span>0° 以下</span>
-            `;
-            track.appendChild(baseZone);
-        }
-
         function updateScaleTrackVisual(twistDeg, activeIdx, isLocked) {
             const track = document.getElementById('scale-track');
+            const ladder = document.getElementById('pitch-ladder');
+            if (!track) return;
+
             const cfg = getScaleConfig();
             const count = cfg.notes.length;
-
-            // 基準境界線（MIN_PLAY_ANGLE=4.5°）が50%位置に来るオフセットを計算
-            // track内の全scale-layer高さ合計 = count * layerPxHeight
             const layersTotalH = count * layerPxHeight;
-            // twistDeg=0 のとき 0°境界がちょうど中央(50%)付近に来るようにし、
-            // twistDegが増えると上に積まれた音階層が中央へ降りてくる
-            const degFromBase = Math.max(-18, twistDeg - MIN_PLAY_ANGLE);
+            const degFromBase = Math.max(-16, twistDeg - MIN_PLAY_ANGLE);
             const pxPerDeg = layerPxHeight / LAYER_DEG_SPAN;
             const translateY = -layersTotalH + degFromBase * pxPerDeg;
 
@@ -752,18 +839,29 @@
                     const a = isLocked ? 0.34 : 0.22;
                     el.style.background = `linear-gradient(90deg,
                         hsla(${hue}, 92%, 62%, ${a}) 0%,
-                        hsla(${hue}, 92%, 62%, ${a * 0.48}) 50%,
+                        hsla(${hue}, 92%, 62%, ${a * 0.45}) 50%,
                         hsla(${hue}, 92%, 62%, ${a}) 100%)`;
-                    el.style.boxShadow = `inset 0 0 28px hsla(${hue}, 95%, 65%, ${isLocked ? 0.38 : 0.16})`;
                 } else {
                     el.classList.remove('active');
                     el.style.background = `linear-gradient(90deg,
                         hsla(${hue}, 82%, 58%, 0.12) 0%,
                         hsla(${hue}, 82%, 58%, 0.03) 50%,
                         hsla(${hue}, 82%, 58%, 0.12) 100%)`;
-                    el.style.boxShadow = 'none';
                 }
             });
+
+            if (ladder) {
+                const pips = ladder.querySelectorAll('.ladder-pip');
+                pips.forEach(p => {
+                    p.classList.toggle('active', parseInt(p.dataset.idx, 10) === activeIdx);
+                });
+                const cursor = document.getElementById('ladder-cursor');
+                if (cursor) {
+                    const maxSpan = count * LAYER_DEG_SPAN;
+                    const ratio = Math.max(0, Math.min(1, (twistDeg - MIN_PLAY_ANGLE) / maxSpan));
+                    cursor.style.bottom = `${4 + ratio * (ladder.clientHeight - 12)}px`;
+                }
+            }
         }
 
         // ==========================================
@@ -789,7 +887,7 @@
             return 440 * Math.pow(2, (midi - 69) / 12);
         }
 
-        function createReverbBuffer(ctx, duration = 1.8, decay = 2.6) {
+        function createReverbBuffer(ctx, duration = 1.6, decay = 2.6) {
             const len = Math.floor(ctx.sampleRate * duration);
             const buf = ctx.createBuffer(2, len, ctx.sampleRate);
             for (let ch = 0; ch < 2; ch++) {
@@ -803,7 +901,7 @@
 
         function createDistortionCurve(amount = 0) {
             const k = amount;
-            const n = 2048;
+            const n = 1024;
             const curve = new Float32Array(n);
             const deg = Math.PI / 180;
             for (let i = 0; i < n; ++i) {
@@ -815,8 +913,9 @@
 
         function setupAudio() {
             if (audioCtx) return;
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContext();
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return;
+            audioCtx = new AudioCtx();
 
             osc1 = audioCtx.createOscillator();
             osc2 = audioCtx.createOscillator();
@@ -825,7 +924,7 @@
             osc2Gain = audioCtx.createGain();
             osc3Gain = audioCtx.createGain();
 
-            const noiseLen = audioCtx.sampleRate * 2;
+            const noiseLen = audioCtx.sampleRate;
             const noiseBuf = audioCtx.createBuffer(1, noiseLen, audioCtx.sampleRate);
             const nd = noiseBuf.getChannelData(0);
             for (let i = 0; i < noiseLen; i++) nd[i] = Math.random() * 2 - 1;
@@ -854,7 +953,6 @@
 
             waveShaper = audioCtx.createWaveShaper();
             waveShaper.curve = createDistortionCurve(0);
-            waveShaper.oversample = '2x';
 
             voiceGain = audioCtx.createGain();
             voiceGain.gain.value = 0;
@@ -863,7 +961,7 @@
             dryGain.gain.value = 0.9;
 
             reverbNode = audioCtx.createConvolver();
-            reverbNode.buffer = createReverbBuffer(audioCtx, 1.8, 2.6);
+            reverbNode.buffer = createReverbBuffer(audioCtx, 1.6, 2.6);
             reverbSend = audioCtx.createGain();
             reverbSend.gain.value = 0.12;
 
@@ -928,13 +1026,12 @@
             const now = audioCtx.currentTime;
 
             if (preset === 'piano') {
-                // 🎹 ピアノ（明瞭で簡単なピアノ曲が気持ちよく弾けるバランス）
                 osc1.type = 'triangle';
                 osc2.type = 'sine';
                 osc3.type = 'sine';
                 osc1.detune.setValueAtTime(0, now);
-                osc2.detune.setValueAtTime(1200, now); // 2倍音
-                osc3.detune.setValueAtTime(1902, now); // 3倍音（打鍵の芯）
+                osc2.detune.setValueAtTime(1200, now);
+                osc3.detune.setValueAtTime(1902, now);
                 osc1Gain.gain.setTargetAtTime(0.55, now, 0.02);
                 osc2Gain.gain.setTargetAtTime(0.22, now, 0.02);
                 osc3Gain.gain.setTargetAtTime(0.08, now, 0.02);
@@ -942,9 +1039,8 @@
                 voiceFilter.Q.setTargetAtTime(1.0, now, 0.03);
                 waveShaper.curve = createDistortionCurve(0);
                 lfoFilterGain.gain.setTargetAtTime(0, now, 0.03);
-                lfoPitchGain.gain.setTargetAtTime(0.4, now, 0.03);
+                lfoPitchGain.gain.setTargetAtTime(0.35, now, 0.03);
             } else if (preset === 'ethereal') {
-                // ✨ 幻想的な音（すぃー）
                 osc1.type = 'sine';
                 osc2.type = 'triangle';
                 osc3.type = 'sine';
@@ -962,7 +1058,6 @@
                 lfoFilterGain.gain.setTargetAtTime(110, now, 0.05);
                 lfoPitchGain.gain.setTargetAtTime(1.2, now, 0.05);
             } else if (preset === 'synth') {
-                // 🎛️ シンセサイザー（ススススイー）
                 osc1.type = 'sawtooth';
                 osc2.type = 'sawtooth';
                 osc3.type = 'sawtooth';
@@ -979,7 +1074,6 @@
                 lfoFilterGain.gain.setTargetAtTime(70, now, 0.05);
                 lfoPitchGain.gain.setTargetAtTime(0.8, now, 0.05);
             } else if (preset === 'moto') {
-                // 🏍️ バイクのうなり（ズーズー）
                 osc1.type = 'sawtooth';
                 osc2.type = 'square';
                 osc3.type = 'sawtooth';
@@ -997,7 +1091,6 @@
                 lfoFilterGain.gain.setTargetAtTime(320, now, 0.05);
                 lfoPitchGain.gain.setTargetAtTime(3.2, now, 0.05);
             } else if (preset === 'trumpet') {
-                // 🎺 トランペット
                 osc1.type = 'sawtooth';
                 osc2.type = 'square';
                 osc3.type = 'sawtooth';
@@ -1017,12 +1110,10 @@
             }
         }
 
-        // 停止ロックした瞬間のみ発音開始！（途中経過の音階は絶対に鳴らさない）
         function triggerLockedNote(freq, rpmNorm, rollDeg) {
             if (!audioCtx || audioCtx.state !== 'running') return;
             const now = audioCtx.currentTime;
 
-            // 音程を即座に固定セット
             osc1.frequency.cancelScheduledValues(now);
             osc2.frequency.cancelScheduledValues(now);
             osc3.frequency.cancelScheduledValues(now);
@@ -1043,11 +1134,10 @@
             }
 
             if (currentPreset === 'piano') {
-                // ピアノらしい明瞭な打鍵アタック＆自然な減衰サステイン
                 voiceFilter.frequency.setValueAtTime(4800, now);
                 voiceFilter.frequency.exponentialRampToValueAtTime(1350, now + 0.24);
                 voiceGain.gain.setValueAtTime(0.001, now);
-                voiceGain.gain.linearRampToValueAtTime(0.62, now + 0.008);
+                voiceGain.gain.linearRampToValueAtTime(0.64, now + 0.008);
                 voiceGain.gain.exponentialRampToValueAtTime(0.24, now + 0.48);
             } else if (currentPreset === 'ethereal') {
                 voiceFilter.frequency.setValueAtTime(1400 + rpmNorm * 2200, now);
@@ -1071,14 +1161,13 @@
             }
 
             updateSpatialEffects(rollDeg);
-            if (navigator.vibrate) navigator.vibrate(22);
+            try { if (navigator.vibrate) navigator.vibrate(20); } catch (_) {}
         }
 
         function updateSpatialEffects(rollDeg) {
             if (!audioCtx || audioCtx.state !== 'running') return;
             const now = audioCtx.currentTime;
 
-            // 左右傾けの中央±7°はクリーンな遊び（ピアノ演奏時のブレ耐性）
             const deadRoll = Math.abs(rollDeg) < 7 ? 0 : (rollDeg > 0 ? rollDeg - 7 : rollDeg + 7);
             const normRoll = Math.max(-1, Math.min(1, deadRoll / 32));
 
@@ -1105,32 +1194,425 @@
         }
 
         // ==========================================
-        // 4. センサー＆コントロール処理（ファイル1継承）
+        // 4. センサー＆コントロール処理
         // ==========================================
-        let curPitch = 0, curRoll = 0;
-        let offsetTwist = 0, offsetRoll = 0;
-        let isCalibratedOnce = false;
-        let invertTwist = false;
+        let toastTimer = null;
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            if (!t) return;
+            t.textContent = msg;
+            t.style.display = 'block';
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => { t.style.display = 'none'; }, 2200);
+        }
 
-        let smoothTwist = 0, smoothRoll = 0;
-        let prevTwist = 0, twistVel = 0;
-        let currentRPM = 0;
+        function startApp(e) {
+            if (e) e.stopPropagation();
 
-        // 水平水面スプリング物理（ファイル1継承）
-        let velocityY = 0, lastPitchForSpring = 0, springY = 0;
+            try {
+                setupAudio();
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            } catch (err) {
+                console.warn('Audio init:', err);
+            }
 
-        // 厳密ステートマシン: 'NEUTRAL' | 'AIMING' | 'LOCKED'
-        let playState = 'NEUTRAL';
-        let peakAimVel = 0;
-        let settleMs = 0;
-        let lockedIndex = -1;
-        let lockedNoteName = '';
-        let lockedFreq = 0;
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(state => {
+                        if (state !== 'granted') showToast("センサー未許可（画面ドラッグで操作可）");
+                        beginSensing();
+                    })
+                    .catch(() => beginSensing());
+            } else {
+                beginSensing();
+            }
+        }
 
-        let colorNormal = "#10b981";
-        let colorSide = "#ef4444";
-        let isCameraOn = false;
-        let videoStream = null;
-        let isStarted = false;
+        function beginSensing() {
+            const overlay = document.getElementById('start-overlay');
+            if (overlay) overlay.style.display = 'none';
+            isStarted = true;
+            window.addEventListener('deviceorientation', handleOrientation, true);
+            updateColors();
+            showToast("今の姿勢を 0° 基準面に設定しました");
+        }
 
-        let toastTimer
+        function getHardwareSign() {
+            let ang = 90;
+            if (window.screen && screen.orientation && typeof screen.orientation.angle === 'number') {
+                ang = screen.orientation.angle;
+            } else if (typeof window.orientation === 'number') {
+                ang = window.orientation;
+            }
+            const osSign = (ang === -90 || ang === 270) ? -1 : 1;
+            return osSign * (flip180 ? -1 : 1);
+        }
+
+        function handleOrientation(e) {
+            if (e.beta === null && e.gamma === null) return;
+            const rawB = e.beta || 0;
+            const rawG = e.gamma || 0;
+
+            let roll = rawB;
+            if (roll > 90) roll = 180 - roll;
+            else if (roll < -90) roll = -180 - roll;
+
+            // 90°付近のジンバルスパイク抑制
+            if (Math.abs(rawG) > 78 && Math.abs(roll - prevSafeRoll) > 35) {
+                roll = prevSafeRoll;
+            } else {
+                prevSafeRoll = roll;
+            }
+
+            let twist = rawG;
+            if (Math.abs(rawB) > 90) {
+                twist = rawG >= 0 ? (180 - rawG) : (-180 - rawG);
+            }
+
+            const sign = getHardwareSign();
+            curPitch = twist * sign;
+            curRoll  = roll * sign;
+
+            if (!isCalibratedOnce) {
+                offsetTwist = curPitch;
+                offsetRoll = curRoll;
+                isCalibratedOnce = true;
+            }
+        }
+
+        function calibrate(e) {
+            if (e) e.stopPropagation();
+            offsetTwist = curPitch;
+            offsetRoll = curRoll;
+            smoothTwist = 0;
+            smoothRoll = 0;
+            prevTwist = 0;
+            twistVel = 0;
+            playState = 'NEUTRAL';
+            lockedIndex = -1;
+            lockedNoteName = '';
+            peakAimVel = 0;
+            settleMs = 0;
+            releaseNote(100);
+            try { if (navigator.vibrate) navigator.vibrate(25); } catch (_) {}
+            showToast("ここを 0°（無音基準面）に設定しました");
+        }
+
+        stage.addEventListener('pointerdown', (e) => {
+            if (!isStarted) return;
+            if (e.target && e.target.closest && e.target.closest('#top-controls, #bottom-bar, #start-overlay')) return;
+            dragStartTime = performance.now();
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+            dragMoved = false;
+            isDragging = true;
+            dragBaseTwist = curPitch;
+            dragBaseRoll = curRoll;
+        });
+
+        window.addEventListener('pointermove', (e) => {
+            if (!isDragging) return;
+            const rawDx = e.clientX - dragStartX;
+            const rawDy = e.clientY - dragStartY;
+            if (Math.hypot(rawDx, rawDy) > 10) dragMoved = true;
+
+            const rad = (-activeRotationDeg * Math.PI) / 180;
+            const localDx = rawDx * Math.cos(rad) - rawDy * Math.sin(rad);
+            const localDy = rawDx * Math.sin(rad) + rawDy * Math.cos(rad);
+
+            const invSign = invertTwist ? -1 : 1;
+            curPitch = offsetTwist + Math.max(-20, Math.min(55, (dragBaseTwist - offsetTwist) + (-localDy * 0.24) * invSign));
+            curRoll  = offsetRoll  + Math.max(-45, Math.min(45, (dragBaseRoll - offsetRoll) + (localDx * 0.22)));
+            isCalibratedOnce = true;
+        });
+
+        window.addEventListener('pointerup', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            const tapDuration = performance.now() - dragStartTime;
+            // 誤タッチ防止：350ms以内の素早いタップのみ 0° 基準面セットとして認識
+            if (!dragMoved && tapDuration < 350 && isStarted) {
+                if (!(e.target && e.target.closest && e.target.closest('#top-controls, #bottom-bar, #start-overlay'))) {
+                    calibrate();
+                }
+            }
+        });
+        window.addEventListener('pointercancel', () => { isDragging = false; });
+
+        function toggleInvert(e) {
+            if (e) e.stopPropagation();
+            invertTwist = !invertTwist;
+            document.getElementById('invert-btn').classList.toggle('active', invertTwist);
+            showToast(invertTwist ? "ひねり方向：反転" : "ひねり方向：標準");
+        }
+
+        function onScaleChange(e) {
+            if (e) e.stopPropagation();
+            buildScaleLayers();
+            lockedIndex = -1;
+        }
+
+        function selectPreset(preset, e) {
+            if (e) e.stopPropagation();
+            currentPreset = preset;
+            document.querySelectorAll('.preset-pill').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.preset === preset);
+            });
+            applyPresetConfig(preset);
+        }
+
+        function getRandomBrightColor() {
+            const r = Math.floor(Math.random() * 140 + 105).toString(16).padStart(2, '0');
+            const g = Math.floor(Math.random() * 140 + 105).toString(16).padStart(2, '0');
+            const b = Math.floor(Math.random() * 140 + 105).toString(16).padStart(2, '0');
+            return `#${r}${g}${b}`;
+        }
+
+        function hexToRgba(hex, alpha) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+
+        function changeColors(e) {
+            if (e) e.stopPropagation();
+            colorNormal = getRandomBrightColor();
+            colorSide = getRandomBrightColor();
+            updateColors();
+            showToast("テーマカラーを変更しました");
+        }
+
+        function updateColors() {
+            document.documentElement.style.setProperty('--color-normal', colorNormal);
+            document.documentElement.style.setProperty('--color-side', colorSide);
+            if (isCameraOn) {
+                document.documentElement.style.setProperty('--bg-black', 'rgba(0,0,0,0)');
+                document.documentElement.style.setProperty('--overlay-color', hexToRgba(colorNormal, 0.16));
+            } else {
+                document.documentElement.style.setProperty('--bg-black', '#000000');
+                document.documentElement.style.setProperty('--overlay-color', 'rgba(0,0,0,0)');
+            }
+        }
+
+        async function toggleCamera(e) {
+            if (e) e.stopPropagation();
+            const videoObj = document.getElementById('camera-bg');
+            const btn = document.getElementById('cam-btn');
+
+            if (isCameraOn) {
+                if (videoStream) videoStream.getTracks().forEach(t => t.stop());
+                videoObj.srcObject = null;
+                videoObj.style.display = 'none';
+                isCameraOn = false;
+                btn.textContent = "📷 AR OFF";
+                btn.classList.remove('active');
+                updateColors();
+            } else {
+                try {
+                    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                        throw new Error('no camera api');
+                    }
+                    videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                    videoObj.srcObject = videoStream;
+                    videoObj.style.display = 'block';
+                    isCameraOn = true;
+                    btn.textContent = "📷 AR ON";
+                    btn.classList.add('active');
+                    updateColors();
+                    showToast("ARモードを起動しました");
+                } catch (err) {
+                    showToast("カメラを利用できません");
+                }
+            }
+        }
+
+        // ==========================================
+        // 5. メインループ（止めた音で厳密固定＆0°戻しリセット）
+        // ==========================================
+        function getNoteForAngle(twistDeg) {
+            const cfg = getScaleConfig();
+            const count = cfg.notes.length;
+            let idx = Math.floor((twistDeg - MIN_PLAY_ANGLE) / LAYER_DEG_SPAN);
+            idx = Math.max(0, Math.min(count - 1, idx));
+            const midi = cfg.notes[idx];
+            return {
+                idx,
+                freq: midiToFreq(midi),
+                label: cfg.labels[idx]
+            };
+        }
+
+        let lastTime = performance.now();
+
+        function loop(now) {
+            const dt = Math.min(0.08, Math.max(0.004, (now - lastTime) / 1000));
+            lastTime = now;
+
+            if (isStarted) {
+                let rawTwist = curPitch - offsetTwist;
+                if (invertTwist) rawTwist = -rawTwist;
+                const rawRoll = curRoll - offsetRoll;
+
+                smoothTwist += (rawTwist - smoothTwist) * 0.44;
+                smoothRoll  += (rawRoll - smoothRoll) * 0.30;
+
+                const instVel = (smoothTwist - prevTwist) / dt;
+                twistVel += (instVel - twistVel) * 0.48;
+                prevTwist = smoothTwist;
+                const velAbs = Math.abs(twistVel);
+
+                const targetRPM = Math.max(0, Math.min(1, smoothTwist / 42));
+                currentRPM += (targetRPM - currentRPM) * 0.16;
+
+                let previewIdx = -1;
+                let readoutText = '0° BASE';
+
+                if (playState === 'LOCKED') {
+                    // 0°以下（RESET_ANGLE以下）へ戻すまで音程固定！
+                    if (smoothTwist <= RESET_ANGLE) {
+                        playState = 'NEUTRAL';
+                        lockedIndex = -1;
+                        lockedNoteName = '';
+                        lockedFreq = 0;
+                        peakAimVel = 0;
+                        settleMs = 0;
+                        releaseNote(velAbs);
+                    } else {
+                        updateSpatialEffects(smoothRoll);
+                        previewIdx = lockedIndex;
+                        readoutText = lockedNoteName;
+                    }
+                } else {
+                    if (smoothTwist < MIN_PLAY_ANGLE) {
+                        playState = 'NEUTRAL';
+                        peakAimVel = 0;
+                        settleMs = 0;
+                        previewIdx = -1;
+                        readoutText = smoothTwist <= 0 ? '0° BASE' : 'READY';
+                    } else {
+                        playState = 'AIMING';
+                        const target = getNoteForAngle(smoothTwist);
+                        previewIdx = target.idx;
+                        readoutText = target.label;
+
+                        if (velAbs > peakAimVel) peakAimVel = velAbs;
+
+                        // 加速度・速度が落ちて静止した瞬間に固定発音
+                        const isSlowed = peakAimVel >= 24 ? (velAbs < 13) : (velAbs < 8);
+                        if (isSlowed) {
+                            settleMs += dt * 1000;
+                            const waitMs = peakAimVel >= 24 ? 30 : 105;
+                            if (settleMs >= waitMs) {
+                                playState = 'LOCKED';
+                                lockedIndex = target.idx;
+                                lockedNoteName = target.label;
+                                lockedFreq = target.freq;
+                                triggerLockedNote(lockedFreq, currentRPM, smoothRoll);
+                            }
+                        } else {
+                            settleMs = 0;
+                        }
+                    }
+                }
+
+                updateVisuals(smoothTwist, smoothRoll, previewIdx, readoutText, velAbs);
+            }
+
+            requestAnimationFrame(loop);
+        }
+
+        function updateVisuals(twistDeg, rollDeg, activeIdx, readoutText, velAbs) {
+            const angleText = document.getElementById('angle-text');
+            const noteReadout = document.getElementById('note-readout');
+            const statePill = document.getElementById('state-pill');
+            const bTop = document.getElementById('bubble-top');
+            const bBottom = document.getElementById('bubble-bottom');
+            const seaLevel = document.getElementById('sea-level');
+            const lens = document.getElementById('liquid-lens');
+            const tickL = document.getElementById('tick-left');
+            const tickR = document.getElementById('tick-right');
+            const spaceDot = document.getElementById('space-dot');
+
+            const accelY = (twistDeg - lastPitchForSpring);
+            velocityY += accelY * 1.4;
+            velocityY += -0.1 * springY;
+            velocityY *= 0.84;
+            springY += velocityY;
+            lastPitchForSpring = twistDeg;
+
+            const dispDeg = Math.round(twistDeg);
+            angleText.textContent = `${dispDeg}°`;
+            noteReadout.textContent = readoutText;
+
+            updateScaleTrackVisual(twistDeg, activeIdx, playState === 'LOCKED');
+
+            const horizonShiftY = twistDeg * 4.2;
+            seaLevel.style.transform = `translateY(${horizonShiftY + springY}px) rotate(${-rollDeg}deg)`;
+
+            tickL.style.transform = `translateY(${-rollDeg * 1.1}px)`;
+            tickR.style.transform = `translateY(${rollDeg * 1.1}px)`;
+
+            const spacePct = 50 + Math.max(-46, Math.min(46, (rollDeg / 38) * 46));
+            spaceDot.style.left = `${spacePct}%`;
+
+            const moveX = rollDeg * 2.0;
+            const moveY = -twistDeg * 1.6;
+            const absD = Math.abs(dispDeg);
+            const gap = absD * 1.1 + Math.pow(absD / 12, 2);
+            const stretchY = 1 + Math.min(velAbs / 280, 0.14);
+            const stretchX = 1 - Math.min(velAbs / 560, 0.08);
+            bTop.style.transform = `translate(${moveX}px, ${moveY - gap}px) scale(${stretchX}, ${stretchY}) rotate(${-rollDeg}deg)`;
+            bBottom.style.transform = `translate(${moveX}px, ${moveY + gap}px) scale(${stretchX}, ${stretchY}) rotate(${-rollDeg}deg)`;
+
+            document.getElementById('grid').style.transform = `translate(${rollDeg * 1.6}px, ${twistDeg * 1.6}px)`;
+
+            const lx = 1 + Math.min(0.07, velAbs / 360);
+            const ly = 1 - Math.min(0.05, velAbs / 460) + (playState === 'LOCKED' ? Math.sin(performance.now() * 0.022) * 0.015 : 0);
+            lens.style.transform = `scale(${lx}, ${ly}) rotate(${-rollDeg * 0.22}deg)`;
+
+            if (playState === 'NEUTRAL') {
+                statePill.textContent = twistDeg <= 0 ? '0° SILENT' : 'READY';
+                statePill.style.background = hexToRgba(colorNormal, 0.25);
+                statePill.style.borderColor = colorNormal;
+                document.documentElement.style.setProperty('--active-band-color', colorNormal);
+                seaLevel.style.borderTopColor = 'rgba(255,255,255,0.85)';
+                document.body.style.backgroundColor = isCameraOn ? hexToRgba(colorNormal, 0.2) : '#000000';
+                bTop.style.backgroundColor = 'rgba(255,255,255,0.22)';
+                bBottom.style.backgroundColor = 'rgba(255,255,255,0.22)';
+            } else if (playState === 'AIMING') {
+                statePill.textContent = 'AIMING (STOP TO PLAY)';
+                statePill.style.background = hexToRgba(colorSide, 0.36);
+                statePill.style.borderColor = colorSide;
+                document.documentElement.style.setProperty('--active-band-color', colorSide);
+                seaLevel.style.borderTopColor = colorSide;
+                document.body.style.backgroundColor = isCameraOn ? hexToRgba(colorSide, 0.16) : '#000000';
+                bTop.style.backgroundColor = 'rgba(255,255,255,0.12)';
+                bBottom.style.backgroundColor = 'rgba(255,255,255,0.12)';
+            } else {
+                statePill.textContent = 'FIXED ♪ (0°で戻す)';
+                statePill.style.background = hexToRgba(colorNormal, 0.48);
+                statePill.style.borderColor = colorNormal;
+                document.documentElement.style.setProperty('--active-band-color', colorNormal);
+                seaLevel.style.borderTopColor = colorNormal;
+                document.body.style.backgroundColor = isCameraOn ? hexToRgba(colorNormal, 0.26) : '#02120c';
+                bTop.style.backgroundColor = hexToRgba(colorNormal, 0.28);
+                bBottom.style.backgroundColor = hexToRgba(colorNormal, 0.28);
+            }
+        }
+
+        // DOM確定後に安全に起動
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                updateLayoutOrientation();
+                requestAnimationFrame(loop);
+            });
+        } else {
+            updateLayoutOrientation();
+            requestAnimationFrame(loop);
+        }
+    </script>
+</body>
+</html>
